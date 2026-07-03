@@ -1,0 +1,258 @@
+:root {
+  --bg-base: #1E1E24;
+  --bg-surface: #3D3A3E;
+  --text-primary: #FFFFFF;
+  --text-muted: #A0A0A5;
+  --accent-primary: #39FF14;
+  --accent-solana: #9945FF;
+  --state-success: #14F195;
+
+  --font-arcade: "Press Start 2P", ui-monospace, "Menlo", monospace;
+  --font-mono: "VT323", ui-monospace, "SF Mono", "Cascadia Mono", monospace;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-root {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vh * (9 / 16);
+  aspect-ratio: 9 / 16;
+  background: var(--bg-base);
+}
+
+#game-over-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 260ms ease-out;
+}
+
+#game-over-modal.visible {
+  display: flex;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+#game-over-modal .modal-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6) saturate(1.1);
+}
+
+#game-over-modal .modal-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(15,15,19,0.35), rgba(15,15,19,0.9) 75%),
+    linear-gradient(180deg, rgba(15,15,19,0.55), rgba(15,15,19,0.85));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+#game-over-modal .modal-content {
+  position: relative;
+  z-index: 1;
+  width: min(88vw, 460px);
+  padding: 28px 24px 24px;
+  border-radius: 20px;
+  background: rgba(15, 15, 19, 0.7);
+  border: 2px solid rgba(57, 255, 20, 0.35);
+  box-shadow:
+    0 0 40px rgba(57, 255, 20, 0.25),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+  text-align: center;
+  transform: translateY(12px) scale(0.96);
+  transition: transform 300ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+#game-over-modal.visible .modal-content {
+  transform: translateY(0) scale(1);
+}
+
+#game-over-modal .modal-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+#game-over-modal .modal-title {
+  font-family: var(--font-arcade);
+  font-size: 28px;
+  color: var(--accent-primary);
+  margin: 4px 0 20px;
+  text-shadow: 0 0 12px rgba(57, 255, 20, 0.75), 3px 3px 0 #000;
+  letter-spacing: 1px;
+}
+
+#game-over-modal .modal-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 0 0 18px;
+}
+
+#game-over-modal .stat {
+  padding: 10px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(160, 160, 165, 0.15);
+}
+
+#game-over-modal .stat-label {
+  font-family: var(--font-arcade);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+#game-over-modal .stat-value {
+  font-family: var(--font-arcade);
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+#game-over-modal .modal-wallet-status {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--text-muted);
+  min-height: 24px;
+  margin-bottom: 16px;
+}
+
+#game-over-modal .modal-wallet-status.holder {
+  color: var(--state-success);
+}
+
+#game-over-modal .modal-wallet-status.non-holder {
+  color: #ff9d3b;
+}
+
+#game-over-modal .modal-input-wrap {
+  margin: 0 0 14px;
+  text-align: left;
+}
+
+#game-over-modal .modal-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(160, 160, 165, 0.3);
+  border-radius: 10px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+#game-over-modal .modal-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.35);
+}
+
+#game-over-modal .modal-input-error {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: #ff5c5c;
+  min-height: 18px;
+  margin-top: 6px;
+  padding-left: 4px;
+}
+
+#game-over-modal .modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#game-over-modal .modal-btn {
+  font-family: var(--font-arcade);
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 14px 12px;
+  border: 2px solid;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-primary);
+  transition: transform 100ms ease-out, background 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+#game-over-modal .modal-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+#game-over-modal .modal-btn.primary {
+  background: rgba(57, 255, 20, 0.14);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.6);
+  box-shadow: 0 0 18px rgba(57, 255, 20, 0.3);
+}
+
+#game-over-modal .modal-btn.primary.buy {
+  background: rgba(153, 69, 255, 0.16);
+  border-color: var(--accent-solana);
+  color: var(--accent-solana);
+  text-shadow: 0 0 6px rgba(153, 69, 255, 0.7);
+  box-shadow: 0 0 18px rgba(153, 69, 255, 0.35);
+}
+
+#game-over-modal .modal-btn.secondary {
+  border-color: rgba(160, 160, 165, 0.4);
+  color: var(--text-muted);
+}
+
+#game-over-modal .modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#game-over-modal .modal-mock {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(160, 160, 165, 0.2);
+}
+
+#game-over-modal .mock-label {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+#game-over-modal .mock-toggle {
+  font-size: 11px;
+  padding: 8px 12px;
+  border-color: rgba(160, 160, 165, 0.3);
+  color: var(--text-muted);
+}

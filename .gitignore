@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Claude Code local per-user settings (keep team-shared .claude/ config trackable)
+.claude/settings.local.json
+
+# Node (if we ever add build tooling)
+node_modules/

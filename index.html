@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#1E1E24" />
+  <title>Babie Blast</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" />
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1/lib/index.iife.min.js"></script>
+</head>
+<body>
+  <div id="game-root"></div>
+
+  <div id="game-over-modal" aria-hidden="true">
+    <video class="modal-video" muted loop playsinline preload="metadata" poster="assets/img/fentanyl-barbi.webp">
+      <source src="assets/media/barbi-money.mp4" type="video/mp4" />
+    </video>
+    <div class="modal-scrim"></div>
+    <div class="modal-content">
+      <div class="modal-eyebrow">// slum alley shut you down //</div>
+      <h1 class="modal-title">GAME OVER</h1>
+
+      <div class="modal-stats">
+        <div class="stat">
+          <div class="stat-label">SCORE</div>
+          <div class="stat-value" data-slot="score">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">HIGH</div>
+          <div class="stat-value" data-slot="high">0</div>
+        </div>
+      </div>
+
+      <div class="modal-wallet-status" data-slot="wallet-status">reading wallet...</div>
+
+      <div class="modal-input-wrap" data-slot="input-wrap" hidden>
+        <input type="text" class="modal-input" data-slot="address-input" placeholder="paste your solana address" spellcheck="false" autocomplete="off" autocapitalize="off" />
+        <div class="modal-input-error" data-slot="input-error"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn primary" data-slot="primary" type="button">CONNECT WALLET</button>
+        <button class="modal-btn secondary" data-slot="play-again" type="button">PLAY AGAIN</button>
+      </div>
+
+      <div class="modal-mock" data-slot="mock" hidden>
+        <div class="mock-label">MOCK MODE</div>
+        <button class="modal-btn mock-toggle" data-slot="mock-toggle" type="button">TOGGLE HOLDER</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/game/main.js"></script>
+</body>
+</html>
