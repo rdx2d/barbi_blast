@@ -136,13 +136,13 @@ class BoardScene extends Phaser.Scene {
 
   drawTitle() {
     const cx = VIRTUAL_WIDTH / 2;
-    this.add.text(cx + 4, 64 + 4, 'BABIE BLAST', {
+    this.add.text(cx + 4, 64 + 4, 'BARBI BLAST', {
       fontFamily: '"Press Start 2P"',
       fontSize: '36px',
       color: '#000000',
     }).setOrigin(0.5).setAlpha(0.55);
 
-    const title = this.add.text(cx, 64, 'BABIE BLAST', {
+    const title = this.add.text(cx, 64, 'BARBI BLAST', {
       fontFamily: '"Press Start 2P"',
       fontSize: '36px',
       color: CSS.accentPrimary,

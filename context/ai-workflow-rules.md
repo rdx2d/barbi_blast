@@ -1,7 +1,7 @@
 # AI Workflow Rules
 
 ## Approach
-Build Babie Blast incrementally using a strict, spec-driven workflow. The context files define what to build, how to build it, and the current state of progress. Always implement against these specs — do not infer or invent behavior from scratch.
+Build Barbi Blast incrementally using a strict, spec-driven workflow. The context files define what to build, how to build it, and the current state of progress. Always implement against these specs ï¿½ do not infer or invent behavior from scratch.
 
 ## Scoping Rules
 - Work on one feature unit at a time.

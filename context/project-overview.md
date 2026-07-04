@@ -1,9 +1,9 @@
-# Babie Blast � Project Overview
+# Barbi Blast � Project Overview
 
 ## Overview
-Babie Blast is a Telegram Mini App puzzle game whose **primary purpose is to promote the $FB token on Solana (listed on pump.fun)** by giving holders premium in-game features they can't access otherwise. The puzzle is the delivery vehicle for token promotion — not a competing entry in the puzzle-game market.
+Barbi Blast is a Telegram Mini App puzzle game whose **primary purpose is to promote the $FB token on Solana (listed on pump.fun)** by giving holders premium in-game features they can't access otherwise. The puzzle is the delivery vehicle for token promotion — not a competing entry in the puzzle-game market.
 
-The **gameplay grammar is borrowed** from the popular Block Blast mobile game (Hungry Studio) — 8×8 grid, 3-piece tray of fixed-orientation polyominoes, row/column clearing, streak-based scoring — because that loop is already familiar to tens of millions of mobile players. Everything **above the gameplay layer is original to Babie Blast**: the slum / toxic-neon aesthetic, the "Alley Events" chaos system, the "Frog Rocket" token-gated revive, and the $FB balance gate. See `block-blast-research.md` for the borrowed mechanics reference.
+The **gameplay grammar is borrowed** from the popular Block Blast mobile game (Hungry Studio) — 8×8 grid, 3-piece tray of fixed-orientation polyominoes, row/column clearing, streak-based scoring — because that loop is already familiar to tens of millions of mobile players. Everything **above the gameplay layer is original to Barbi Blast**: the slum / toxic-neon aesthetic, the "Alley Events" chaos system, the "Frog Rocket" token-gated revive, and the $FB balance gate. See `block-blast-research.md` for the borrowed mechanics reference.
 
 Players who don't hold enough $FB experience a deliberately truncated version of the game — Alley Events still fire, but the Frog Rocket revive and competitive leaderboard tiers are locked. Failure states deep-link to pump.fun to buy $FB, closing the promotion loop.
 
@@ -13,7 +13,7 @@ Players who don't hold enough $FB experience a deliberately truncated version of
 3. Implement a zero-friction, read-only Solana wallet balance verification check using free RPC layers — never request signing, never touch private keys.
 
 ## Core User Flow
-1. User launches the `@BabieBlastBot` inside Telegram.
+1. User launches the `@BarbiBlastBot` inside Telegram.
 2. User plays the base game to experience the addictive loop (dragging blocks, clearing rows).
 3. User runs out of moves (Game Over) or tries to enter the Daily Tournament.
 4. Game prompts wallet connection to check $FB token balance.
@@ -29,7 +29,7 @@ Players who don't hold enough $FB experience a deliberately truncated version of
 - Streak multiplier: iOS-style rule — clear at least one line every 3 placements to keep the streak alive.
 - Piece generation: pure random from catalog, no bag, no solvability guarantee (matches original).
 
-### Slum Chaos System (original — Babie Blast's differentiator)
+### Slum Chaos System (original — Barbi Blast's differentiator)
 - **Alley Events**: triggered every 500 points to alter the board mid-run (e.g., placing un-clearable trash pieces or fire zones). Not present in Block Blast.
 - **Frog Rocket revive**: token-gated clutch mechanism triggering a board-wipe on game-over. Behind $FB ≥ 500 gate. Replaces the ad-gated / IAP revive in the original.
 

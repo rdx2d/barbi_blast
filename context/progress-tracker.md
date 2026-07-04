@@ -15,7 +15,7 @@
 - **Unit 01 polish pass**:
   - Real asset pipeline: Kenney Puzzle Pack (CC0) sprites in `assets/blocks/`, sourced via `iwenzhou/kenney` GitHub mirror. Preloaded in scene; not yet rendered (reserved for Unit 02).
   - Backdrop: radial vignette + CRT-style horizontal scanlines + procedural noise dither.
-  - Title: `Press Start 2P` "BABIE BLAST" with neon-green glow FX + drop shadow + dark stroke; `VT323` subtitle "// SLUM ALLEY BLOCKS //".
+  - Title: `Press Start 2P` "BARBI BLAST" with neon-green glow FX + drop shadow + dark stroke; `VT323` subtitle "// SLUM ALLEY BLOCKS //".
   - Board: shadowed rounded frame, neon accent border with `postFX.addGlow`, inner bevel, 8x8 cells with dark fill + subtle highlight strip (glossy hint).
   - Footer: "HOLD $FB • UNLOCK FROG ROCKET" in Solana purple, threshold hint in muted VT323.
   - Project backdrop: Fentanyl Barbi WebP layered under vignette at alpha 0.42 + cool blue tint so the toxic board stays legible.
@@ -31,7 +31,7 @@
   - `src/game/scoring.js` — pure Block Blast formula: 1 pt/placed cell + 10 pt/cleared cell, multi-line bonus (2:+30, 3:+80, 4:+130, 5:+200, 6+:+300 cap), full-board-clear override +360. Streak multipliers `[1.0, 1.2, 1.5, 2.0, 2.5]` cap at 2.5×; applied to clear+bonus only, not placement drip. `advanceStreak` runs the iOS-style rule (clear at least once every 3 placements).
   - HUD strip above the board: SCORE (Press Start 2P 26px neon-green), HIGH (18px white, right), STREAK indicator (VT323 22px green) shows current multiplier when active.
   - Placement flow: place → detect clears → flash-and-fade cleared sprites (white tint, scale +30%, alpha to 0 over 260ms) → apply clear to grid → score → advance streak → animate "+N" pop above drop location → banner for combos ("DOUBLE!", "3X COMBO!", "FULL CLEAR!") with glow FX → refresh HUD → tray refill + dim check.
-- **Unit 04**: Alley Events (Trash Drop MVP) — Babie Blast's original chaos layer.
+- **Unit 04**: Alley Events (Trash Drop MVP) — Barbi Blast's original chaos layer.
   - `src/game/grid.js` — extended `CELL_STATE` with `HAZARD=2`. Existing `canPlace` blocks placement on hazards (any non-EMPTY cell is blocked); existing `findClears` naturally skips rows/cols containing hazards (a row is only "full" when every cell is FILLED, not HAZARD).
   - `src/game/alleyEvents.js` — pure module: `ALLEY_EVENT_INTERVAL=500`, `eventsDueAfterScoreCross(prev,next)`, `pickEvent`, `runEvent` dispatcher, `runTrashDrop(grid,{minCount:2,maxCount:3,rng})` returns fresh grid + placed cell list.
   - Trigger: `maybeFireAlleyEvent(prevScore)` at the end of `commitPlacement`. Uses score-boundary crossing so a single big combo that leaps two intervals fires both events in sequence.
@@ -79,7 +79,7 @@
 - **Scoring**: 1 pt/placed cell + 10 pt/cleared cell + multi-line bonus escalating to +300 (6+ lines) or +360 (full board clear).
 - **Streak rule**: iOS-style — at least one line clear every 3 placements to keep the streak alive.
 - **Piece generation**: pure random, no bag, no solvability check (matches original — unwinnable states are legitimate game-overs).
-- **Alley Events**: confirmed original to Babie Blast, not borrowed. Flagged as differentiator.
+- **Alley Events**: confirmed original to Barbi Blast, not borrowed. Flagged as differentiator.
 
 ## Architecture Decisions
 - **Decision**: Game framework selected as pure HTML5 Canvas (Phaser 3 Engine) to satisfy the $0 hosting requirement and avoid server resource consumption during alpha demo launch.
@@ -91,7 +91,7 @@
 
 ## Session Notes
 - Unit 01 shipped end-to-end. Open in a browser at `index.html` (or serve statically) to see the rendered board; no interactivity yet by design.
-- **Research pass (2026-07-03)**: verified Block Blast gameplay grammar to make sure we borrow authentically. Full findings in `context/block-blast-research.md`. Reframed `project-overview.md` to make the token-promotion primary goal explicit — Babie Blast is a $FB utility using borrowed puzzle mechanics, not a puzzle-game competitor.
+- **Research pass (2026-07-03)**: verified Block Blast gameplay grammar to make sure we borrow authentically. Full findings in `context/block-blast-research.md`. Reframed `project-overview.md` to make the token-promotion primary goal explicit — Barbi Blast is a $FB utility using borrowed puzzle mechanics, not a puzzle-game competitor.
 - **Project media wired (2026-07-03)**: `stuff/` contains the $FB token's X media (1 WebP + 5 MP4s). The Fentanyl Barbi WebP is now the backdrop of the game canvas (darkened + cool-tinted + alpha 0.42, painted before vignette/scanlines). One video (`barbi-money.mp4`) staged in `assets/media/` for the future game-over screen — the other 4 videos remain in `stuff/` with proposed uses catalogued in `assets/README.md`. Performance guardrails documented (no video during gameplay, one video alive at a time, lazy-load, `preload="metadata"`, muted+playsinline).
 - **Unit 02 shipped (2026-07-03)**: Piece catalog, tray, drag-and-drop, placement all working. Line clearing is deferred to Unit 03 by design — pieces will accumulate on the board until then. Verified locally before proceeding.
 - **Unit 03 shipped (2026-07-03)**: Line clears, scoring, streak, HUD, combo banners all live. High-water mark is session-only for now — persistence will come with the wallet/Telegram Cloud Storage unit. Verification pending user confirmation.
