@@ -5,6 +5,8 @@ import { findClears, clearedCellSet, applyClears, isFullBoardClear } from './cle
 import { scoreDrop, advanceStreak, multiplierForStreak } from './scoring.js';
 import { ALLEY_EVENT_INTERVAL, eventsDueAfterScoreCross, pickEvent, runEvent, EVENT_META } from './alleyEvents.js';
 import { GameOverModal } from '../ui/gameOverModal.js';
+import { MusicPlayer } from '../audio/musicPlayer.js';
+import { MusicControls } from '../ui/musicControls.js';
 
 const COLORS = Object.freeze({
   bgBase: 0x1e1e24,
@@ -1029,6 +1031,24 @@ async function boot() {
   }
 
   new Phaser.Game(config);
+
+  try {
+    const musicPlayer = new MusicPlayer();
+    new MusicControls({ player: musicPlayer });
+    musicPlayer.start();
+
+    const unlock = () => {
+      musicPlayer.tryUnlock();
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true, passive: true });
+    window.addEventListener('keydown', unlock, { once: true });
+  } catch (err) {
+    console.warn('[music] init failed', err);
+  }
 }
 
 boot();

@@ -23,3 +23,6 @@ npm-debug.log*
 
 # Node (if we ever add build tooling)
 node_modules/
+
+# Raw source media (deployable copies live in assets/)
+/music/

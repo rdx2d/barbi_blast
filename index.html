@@ -16,6 +16,28 @@
 <body>
   <div id="game-root"></div>
 
+  <audio id="bg-audio" preload="none" playsinline></audio>
+
+  <div id="music-hud">
+    <button id="music-btn" type="button" aria-label="Music controls" aria-expanded="false" data-state="playing">
+      <span class="music-icon" aria-hidden="true">♪</span>
+    </button>
+    <div id="music-panel" role="dialog" aria-label="Music settings" hidden>
+      <div class="music-panel-head">
+        <div class="music-panel-label">MUSIC</div>
+        <button class="music-toggle" type="button" data-slot="toggle" aria-pressed="true">
+          <span class="music-toggle-track"><span class="music-toggle-thumb"></span></span>
+          <span class="music-toggle-state" data-slot="toggle-state">ON</span>
+        </button>
+      </div>
+      <div class="music-panel-row">
+        <span class="music-panel-label">VOLUME</span>
+        <input type="range" min="0" max="100" value="55" step="1" data-slot="volume" aria-label="Volume" />
+      </div>
+      <div class="music-panel-track" data-slot="track" title="Now playing">—</div>
+    </div>
+  </div>
+
   <div id="game-over-modal" aria-hidden="true">
     <video class="modal-video" muted loop playsinline preload="metadata" poster="assets/img/fentanyl-barbi.webp">
       <source src="assets/media/barbi-money.mp4" type="video/mp4" />
