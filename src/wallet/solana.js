@@ -1,5 +1,6 @@
 import { FB_MINT, RPC_ENDPOINT } from './constants.js';
 
+const SPL_TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
 
 function getWeb3() {
@@ -30,40 +31,43 @@ function connection() {
   return sharedConnection;
 }
 
+async function readFromProgram(owner, programIdStr) {
+  const web3 = getWeb3();
+  const programId = new web3.PublicKey(programIdStr);
+  const conn = connection();
+  const res = await conn.getParsedTokenAccountsByOwner(owner, { programId });
+  let total = 0;
+  for (const acc of res.value) {
+    const info = acc.account?.data?.parsed?.info;
+    if (info?.mint !== FB_MINT) continue;
+    const uiAmount = info.tokenAmount?.uiAmount;
+    if (typeof uiAmount === 'number') total += uiAmount;
+  }
+  return total;
+}
+
 export async function readFbBalance(walletAddress) {
   const web3 = getWeb3();
   const owner = new web3.PublicKey(walletAddress.trim());
-  const mint = new web3.PublicKey(FB_MINT);
-  const conn = connection();
+
+  const results = await Promise.allSettled([
+    readFromProgram(owner, SPL_TOKEN_PROGRAM_ID),
+    readFromProgram(owner, TOKEN_2022_PROGRAM_ID),
+  ]);
 
   let total = 0;
-
-  try {
-    const res = await conn.getParsedTokenAccountsByOwner(owner, { mint });
-    for (const acc of res.value) {
-      const info = acc.account?.data?.parsed?.info?.tokenAmount;
-      if (info && typeof info.uiAmount === 'number') {
-        total += info.uiAmount;
-      }
+  let anySucceeded = false;
+  for (const r of results) {
+    if (r.status === 'fulfilled') {
+      anySucceeded = true;
+      total += r.value;
+    } else {
+      console.warn('[wallet] program query failed', r.reason?.message ?? r.reason);
     }
-  } catch (err) {
-    console.warn('[wallet] SPL Token query failed', err.message);
   }
 
-  if (total === 0) {
-    try {
-      const programId = new web3.PublicKey(TOKEN_2022_PROGRAM_ID);
-      const res = await conn.getParsedTokenAccountsByOwner(owner, { programId });
-      for (const acc of res.value) {
-        const info = acc.account?.data?.parsed?.info;
-        if (info?.mint === FB_MINT) {
-          const uiAmount = info.tokenAmount?.uiAmount;
-          if (typeof uiAmount === 'number') total += uiAmount;
-        }
-      }
-    } catch (err) {
-      console.warn('[wallet] Token-2022 query failed', err.message);
-    }
+  if (!anySucceeded) {
+    throw new Error('all token program queries failed');
   }
 
   return { balance: total, address: walletAddress.trim() };
