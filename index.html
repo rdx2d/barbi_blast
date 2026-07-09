@@ -16,6 +16,34 @@
 <body>
   <div id="game-root"></div>
 
+  <div id="gate-screen" aria-hidden="false">
+    <div class="gate-backdrop"></div>
+    <div class="gate-scrim"></div>
+    <div class="gate-card">
+      <div class="gate-eyebrow">// solana · $fb access gate //</div>
+      <h1 class="gate-title">BARBI BLAST</h1>
+      <p class="gate-tagline">this alley runs on $FB.<br/>hold at least <strong data-slot="threshold">1,200,000</strong> $FB to enter.</p>
+
+      <div class="gate-status" data-slot="status">checking wallet…</div>
+
+      <div class="gate-input-wrap" data-slot="input-wrap" hidden>
+        <input type="text" class="gate-input" data-slot="address" placeholder="paste your solana address" spellcheck="false" autocomplete="off" autocapitalize="off" />
+        <div class="gate-input-error" data-slot="input-error"></div>
+      </div>
+
+      <div class="gate-actions">
+        <button class="gate-btn primary" data-slot="primary" type="button">VERIFY WALLET</button>
+        <button class="gate-btn buy" data-slot="buy" type="button" hidden>BUY $FB ON PUMP.FUN</button>
+        <button class="gate-btn ghost" data-slot="disconnect" type="button" hidden>use a different address</button>
+      </div>
+
+      <div class="gate-mock" data-slot="mock" hidden>
+        <div class="mock-label">MOCK MODE</div>
+        <button class="gate-btn mock-toggle" data-slot="mock-toggle" type="button">TOGGLE HOLDER</button>
+      </div>
+    </div>
+  </div>
+
   <audio id="bg-audio" preload="none" playsinline></audio>
 
   <div id="music-hud">

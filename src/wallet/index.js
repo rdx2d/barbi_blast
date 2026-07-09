@@ -8,6 +8,8 @@ const isTelegram = () => Boolean(window.Telegram?.WebApp?.initData);
 const hasMockParam = () => new URLSearchParams(location.search).has('mock');
 const MOCK_MODE = hasMockParam() || !isTelegram();
 
+const STORAGE_KEY_ADDRESS = 'bb.wallet.address';
+
 export function isMockMode() {
   return MOCK_MODE;
 }
@@ -17,6 +19,24 @@ let cachedRealState = null;
 
 function classify(balance) {
   return balance >= HOLDER_THRESHOLD;
+}
+
+function readStoredAddress() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY_ADDRESS);
+    return v && isValidSolanaAddress(v) ? v : null;
+  } catch { return null; }
+}
+
+function writeStoredAddress(addr) {
+  try {
+    if (addr) localStorage.setItem(STORAGE_KEY_ADDRESS, addr);
+    else localStorage.removeItem(STORAGE_KEY_ADDRESS);
+  } catch {}
+}
+
+export function getStoredAddress() {
+  return MOCK_MODE ? null : readStoredAddress();
 }
 
 export async function readWalletState() {
@@ -83,7 +103,25 @@ export async function connectWithAddress(address) {
   }
   realWalletAddress = trimmed;
   cachedRealState = null;
-  return readWalletState();
+  const state = await readWalletState();
+  if (state.isHolder) {
+    writeStoredAddress(trimmed);
+  }
+  return state;
+}
+
+export async function verifyStoredAddress() {
+  if (MOCK_MODE) return null;
+  const stored = readStoredAddress();
+  if (!stored) return null;
+  realWalletAddress = stored;
+  cachedRealState = null;
+  const state = await readWalletState();
+  if (!state.isHolder) {
+    realWalletAddress = null;
+    writeStoredAddress(null);
+  }
+  return state;
 }
 
 export async function disconnectWallet() {
@@ -93,6 +131,7 @@ export async function disconnectWallet() {
   }
   realWalletAddress = null;
   cachedRealState = null;
+  writeStoredAddress(null);
   return readWalletState();
 }
 

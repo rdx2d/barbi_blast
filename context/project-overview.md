@@ -5,19 +5,20 @@ Barbi Blast is a Telegram Mini App puzzle game whose **primary purpose is to pro
 
 The **gameplay grammar is borrowed** from the popular Block Blast mobile game (Hungry Studio) — 8×8 grid, 3-piece tray of fixed-orientation polyominoes, row/column clearing, streak-based scoring — because that loop is already familiar to tens of millions of mobile players. Everything **above the gameplay layer is original to Barbi Blast**: the slum / toxic-neon aesthetic, the "Alley Events" chaos system, the "Frog Rocket" token-gated revive, and the $FB balance gate. See `block-blast-research.md` for the borrowed mechanics reference.
 
-Players who don't hold enough $FB experience a deliberately truncated version of the game — Alley Events still fire, but the Frog Rocket revive and competitive leaderboard tiers are locked. Failure states deep-link to pump.fun to buy $FB, closing the promotion loop.
+**Access model (v2, 2026-07-04):** the wallet check is now the FIRST screen. Non-holders can't reach the game at all. To enter, a user must connect a Solana wallet holding at least **1,200,000 $FB** (~$3 at time of writing). Verified holders get the full loop, including the free Frog Rocket revive on game-over (double-gating them would feel bad). Non-holders see the gate screen with a one-tap BUY $FB button that deep-links to pump.fun. The verified address is cached in localStorage and silently re-verified against RPC on each session so that sellers lose access on next reload.
 
 ## Goals
 1. **Promote $FB and drive purchase volume on pump.fun** — the entire product exists to funnel players toward buying $FB. Every gameplay failure state and premium-feature lock is a marketing surface for the token.
 2. Deliver a highly responsive, non-glitchy HTML5 8×8 puzzle engine playable natively inside Telegram, faithful enough to Block Blast's grammar that the loop feels familiar within seconds.
 3. Implement a zero-friction, read-only Solana wallet balance verification check using free RPC layers — never request signing, never touch private keys.
 
-## Core User Flow
-1. User launches the `@BarbiBlastBot` inside Telegram.
-2. User plays the base game to experience the addictive loop (dragging blocks, clearing rows).
-3. User runs out of moves (Game Over) or tries to enter the Daily Tournament.
-4. Game prompts wallet connection to check $FB token balance.
-5. If token criteria are met ($Balance \ge 500 $FB), the player triggers a "Frog Rocket" board clear to continue or unlocks premium features; otherwise, they are redirected to a direct buy link on pump.fun.
+## Core User Flow (v2 — 2026-07-04)
+1. User launches `@BarbiBlastBot` inside Telegram.
+2. **Gate screen appears immediately** with the Barbi backdrop and music. First-time users paste their Solana address; returning users are silently re-verified from cache.
+3. RPC read confirms balance ≥ 1,200,000 $FB → gate dismisses → game boots.
+4. Non-holders see the gate reject state with a one-tap BUY $FB deep-link to pump.fun.
+5. Verified holders play the full loop; on game-over, Frog Rocket revive is free.
+6. If a verified holder sells their $FB, the next session's silent re-verify will fail and they'll see the gate again.
 
 ## Features
 
@@ -36,13 +37,16 @@ Players who don't hold enough $FB experience a deliberately truncated version of
 ### Solana Web3 Verification (original)
 - Read-only RPC check for the $FB token Associated Token Account (ATA).
 - **$FB mint address**: `J1tvQ5QLa8pupPAKSdQXdru6T4uoCFrRSUNkdsbApump` (Solana, pump.fun).
-- Deep-linked "Buy $FB" portal targeting pump.fun, surfaced on every failure state a non-holder hits.
+- **Holder threshold**: 1,200,000 $FB (~$3 USD at launch).
+- Deep-linked "Buy $FB" portal on the gate screen for non-holders and any failure state.
+- Verified addresses cached in localStorage; re-verified against RPC each session.
 - **Dev mock wallet**: outside Telegram (or with `?mock=1`), a dev UI simulates holder / non-holder states for local browser testing without touching an RPC.
 
-### Token-Gated Premium Layer (original — the promotion mechanism)
-- Frog Rocket revive: locked below 500 $FB.
-- Tournament / high-tier leaderboard access: locked below 500 $FB.
-- Non-holders play a truncated version and are funneled to pump.fun; holders get the full loop.
+### Token-Gated Access (v2 — the promotion mechanism)
+- **Whole-app gate**: no holdings, no game. Gate screen is the first thing every user sees.
+- **Threshold**: 1,200,000 $FB (~$3).
+- Verified holders enjoy the full loop including free Frog Rocket revive (double-gating them would feel bad).
+- Non-holders see a one-tap BUY $FB deep-link to pump.fun.
 
 ## Scope
 ### In Scope

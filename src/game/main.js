@@ -5,6 +5,7 @@ import { findClears, clearedCellSet, applyClears, isFullBoardClear } from './cle
 import { scoreDrop, advanceStreak, multiplierForStreak } from './scoring.js';
 import { ALLEY_EVENT_INTERVAL, eventsDueAfterScoreCross, pickEvent, runEvent, EVENT_META } from './alleyEvents.js';
 import { GameOverModal } from '../ui/gameOverModal.js';
+import { GateScreen } from '../ui/gateScreen.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
 import { MusicControls } from '../ui/musicControls.js';
 
@@ -1030,13 +1031,11 @@ async function boot() {
     console.warn('Font preload failed, proceeding with fallbacks', err);
   }
 
-  new Phaser.Game(config);
-
+  let musicPlayer = null;
   try {
-    const musicPlayer = new MusicPlayer();
+    musicPlayer = new MusicPlayer();
     new MusicControls({ player: musicPlayer });
     musicPlayer.start();
-
     const unlock = () => {
       musicPlayer.tryUnlock();
       window.removeEventListener('pointerdown', unlock);
@@ -1049,6 +1048,12 @@ async function boot() {
   } catch (err) {
     console.warn('[music] init failed', err);
   }
+
+  const gate = new GateScreen();
+  gate.begin();
+  await gate.awaitVerified();
+
+  new Phaser.Game(config);
 }
 
 boot();
