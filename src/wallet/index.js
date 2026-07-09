@@ -4,9 +4,8 @@ import { readFbBalance, isValidSolanaAddress } from './solana.js';
 
 export { FB_MINT, HOLDER_THRESHOLD, PUMP_FUN_URL, RPC_ENDPOINT, isValidSolanaAddress };
 
-const isTelegram = () => Boolean(window.Telegram?.WebApp?.initData);
 const hasMockParam = () => new URLSearchParams(location.search).has('mock');
-const MOCK_MODE = hasMockParam() || !isTelegram();
+const MOCK_MODE = hasMockParam();
 
 const STORAGE_KEY_ADDRESS = 'bb.wallet.address';
 
