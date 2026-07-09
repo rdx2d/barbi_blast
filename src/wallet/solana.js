@@ -1,4 +1,4 @@
-import { FB_MINT, RPC_ENDPOINT } from './constants.js';
+import { FB_MINT, RPC_ENDPOINT, RPC_FALLBACKS } from './constants.js';
 
 const SPL_TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
@@ -22,19 +22,19 @@ export function isValidSolanaAddress(str) {
   }
 }
 
-let sharedConnection = null;
-function connection() {
-  if (!sharedConnection) {
+const connectionCache = new Map();
+function connectionFor(endpoint) {
+  if (!connectionCache.has(endpoint)) {
     const web3 = getWeb3();
-    sharedConnection = new web3.Connection(RPC_ENDPOINT, 'confirmed');
+    connectionCache.set(endpoint, new web3.Connection(endpoint, 'confirmed'));
   }
-  return sharedConnection;
+  return connectionCache.get(endpoint);
 }
 
-async function readFromProgram(owner, programIdStr) {
+async function readFromProgramAt(endpoint, owner, programIdStr) {
   const web3 = getWeb3();
   const programId = new web3.PublicKey(programIdStr);
-  const conn = connection();
+  const conn = connectionFor(endpoint);
   const res = await conn.getParsedTokenAccountsByOwner(owner, { programId });
   let total = 0;
   for (const acc of res.value) {
@@ -46,29 +46,39 @@ async function readFromProgram(owner, programIdStr) {
   return total;
 }
 
+async function tryEndpoint(endpoint, owner) {
+  const results = await Promise.allSettled([
+    readFromProgramAt(endpoint, owner, SPL_TOKEN_PROGRAM_ID),
+    readFromProgramAt(endpoint, owner, TOKEN_2022_PROGRAM_ID),
+  ]);
+  const errs = [];
+  let anyOk = false;
+  let total = 0;
+  for (const r of results) {
+    if (r.status === 'fulfilled') { anyOk = true; total += r.value; }
+    else errs.push(r.reason?.message ?? String(r.reason));
+  }
+  if (!anyOk) throw new Error(errs[0] || 'unknown rpc error');
+  return total;
+}
+
 export async function readFbBalance(walletAddress) {
   const web3 = getWeb3();
   const owner = new web3.PublicKey(walletAddress.trim());
 
-  const results = await Promise.allSettled([
-    readFromProgram(owner, SPL_TOKEN_PROGRAM_ID),
-    readFromProgram(owner, TOKEN_2022_PROGRAM_ID),
-  ]);
+  const endpoints = [RPC_ENDPOINT, ...RPC_FALLBACKS];
+  const failures = [];
 
-  let total = 0;
-  let anySucceeded = false;
-  for (const r of results) {
-    if (r.status === 'fulfilled') {
-      anySucceeded = true;
-      total += r.value;
-    } else {
-      console.warn('[wallet] program query failed', r.reason?.message ?? r.reason);
+  for (const endpoint of endpoints) {
+    try {
+      const total = await tryEndpoint(endpoint, owner);
+      return { balance: total, address: walletAddress.trim(), endpoint };
+    } catch (err) {
+      const host = new URL(endpoint).host;
+      failures.push(`${host}: ${err.message}`);
+      console.warn('[wallet] endpoint failed', host, err.message);
     }
   }
 
-  if (!anySucceeded) {
-    throw new Error('all token program queries failed');
-  }
-
-  return { balance: total, address: walletAddress.trim() };
+  throw new Error(`all RPCs failed — ${failures.join(' | ')}`);
 }
