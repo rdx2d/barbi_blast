@@ -1036,15 +1036,21 @@ async function boot() {
     musicPlayer = new MusicPlayer();
     new MusicControls({ player: musicPlayer });
     musicPlayer.start();
-    const unlock = () => {
-      musicPlayer.tryUnlock();
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('touchstart', unlock);
-      window.removeEventListener('keydown', unlock);
+
+    // WebKit (Telegram iOS WebView) only grants audio "user activation" on
+    // touchend / click / mousedown / keydown — NOT touchstart or pointerdown.
+    // Keep retrying on every qualifying gesture until one unlock succeeds.
+    const unlockEvents = ['click', 'touchend', 'mousedown', 'keydown'];
+    const tryUnlock = () => {
+      if (musicPlayer.unlocked) { removeUnlockListeners(); return; }
+      musicPlayer.tryUnlock().then((ok) => {
+        if (ok) removeUnlockListeners();
+      });
     };
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('touchstart', unlock, { once: true, passive: true });
-    window.addEventListener('keydown', unlock, { once: true });
+    const removeUnlockListeners = () => {
+      for (const ev of unlockEvents) window.removeEventListener(ev, tryUnlock);
+    };
+    for (const ev of unlockEvents) window.addEventListener(ev, tryUnlock, { passive: true });
   } catch (err) {
     console.warn('[music] init failed', err);
   }

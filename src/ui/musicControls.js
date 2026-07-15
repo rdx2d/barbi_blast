@@ -13,17 +13,20 @@ export class MusicControls {
 
     this.btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      this.player.tryUnlock();
       this.setOpen(!this.open);
     });
 
     this.toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       this.player.toggleMuted();
+      if (!this.player.muted) this.player.tryUnlock();
     });
 
     this.volume.addEventListener('input', () => {
       const v = Number(this.volume.value) / 100;
       this.player.setVolume(v);
+      this.player.tryUnlock();
     });
 
     this.panel.addEventListener('click', (e) => e.stopPropagation());

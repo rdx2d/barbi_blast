@@ -106,16 +106,24 @@ export class MusicPlayer {
   }
 
   async tryUnlock() {
-    if (this.unlocked) return;
+    if (this.unlocked) return true;
     if (!this.currentTrack) {
-      await this.start();
-      return;
+      if (this.queue.length === 0) this.refillQueue();
+      const first = this.queue.shift();
+      this.currentTrack = first;
+      this.audio.src = first.src;
+      this.emit();
     }
     try {
       await this.audio.play();
       this.started = true;
       this.unlocked = true;
-    } catch {}
+      this.emit();
+      return true;
+    } catch (err) {
+      console.info('[music] unlock attempt failed', err?.name ?? err);
+      return false;
+    }
   }
 
   setMuted(muted) {
