@@ -50,6 +50,10 @@ export const SHAPES = Object.freeze(
   })),
 );
 
+export const SHAPE_BY_ID = Object.freeze(
+  Object.fromEntries(SHAPES.map((s) => [s.id, s])),
+);
+
 export function shapeCellCount(shape) {
   return shape.cells;
 }

@@ -1,5 +1,5 @@
 import { GRID_SIZE, CELL_STATE, createEmptyGrid } from './grid.js';
-import { pickRandomTray } from './shapes.js';
+import { pickRandomTray, SHAPE_BY_ID } from './shapes.js';
 import { canPlace, applyPlacement, hasAnyValidPlacement } from './placement.js';
 import { findClears, clearedCellSet, applyClears, isFullBoardClear } from './clearing.js';
 import { scoreDrop, advanceStreak, multiplierForStreak } from './scoring.js';
@@ -10,6 +10,9 @@ import { MusicPlayer } from '../audio/musicPlayer.js';
 import { MusicControls } from '../ui/musicControls.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
+import { saveRunSnapshot, loadRunSnapshot, clearRunSnapshot } from '../storage/progress.js';
+
+let pendingSnapshot = null;
 
 const COLORS = Object.freeze({
   bgBase: 0x1e1e24,
@@ -85,13 +88,81 @@ class BoardScene extends Phaser.Scene {
     this.drawHud();
     this.drawBoard();
     this.drawFooterTag();
-    this.spawnTray();
+
+    const snap = pendingSnapshot;
+    pendingSnapshot = null;
+    if (!(snap && this.applySnapshot(snap))) {
+      this.spawnTray();
+    }
     this.updateTrayDimStates();
     this.refreshHud();
 
     this.modal = new GameOverModal({
       onRevive: () => this.frogRocketRevive(),
       onPlayAgain: () => this.hardReset(),
+    });
+  }
+
+  applySnapshot(snap) {
+    try {
+      const trayPieces = snap.tray.map((t) => {
+        const shape = SHAPE_BY_ID[t.shapeId];
+        if (!shape && !t.placed) throw new Error(`unknown shape ${t.shapeId}`);
+        return { shape: shape ?? SHAPE_BY_ID.mono, colorKey: t.colorKey ?? 'green', placed: !!t.placed };
+      });
+      if (trayPieces.length === 0 || trayPieces.every((t) => t.placed)) {
+        throw new Error('empty tray in snapshot');
+      }
+      this.grid = snap.grid.map((row) => row.slice());
+      this.gridColors = (snap.gridColors ?? createEmptyGrid()).map((row) => row.slice());
+      this.score = snap.score;
+      if (this.score > this.highScore) this.highScore = this.score;
+      this.streakState = snap.streakState ?? { streakCount: 0, placementsSinceLastClear: 0 };
+      this.alleyEventsFired = snap.alleyEventsFired ?? 0;
+      this.restoreBoardSprites();
+      this.spawnTray(trayPieces);
+      return true;
+    } catch (err) {
+      console.warn('[progress] snapshot restore failed:', err.message);
+      return false;
+    }
+  }
+
+  restoreBoardSprites() {
+    const { cellSize } = this.metrics;
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const state = this.grid[r][c];
+        if (state === CELL_STATE.FILLED) {
+          const colorKey = this.gridColors[r][c] || 'green';
+          const world = this.cellToWorld(r, c);
+          const sprite = this.add.image(
+            world.x + cellSize / 2,
+            world.y + cellSize / 2,
+            COLOR_TO_TEXTURE[colorKey] ?? COLOR_TO_TEXTURE.green,
+          );
+          sprite.setDisplaySize(cellSize, cellSize);
+          this.cellSprites[r][c] = sprite;
+        } else if (state === CELL_STATE.HAZARD) {
+          this.spawnHazardCell(r, c);
+        }
+      }
+    }
+  }
+
+  saveProgress() {
+    if (this.gameOver) return;
+    saveRunSnapshot({
+      grid: this.grid,
+      gridColors: this.gridColors,
+      score: this.score,
+      streakState: this.streakState,
+      alleyEventsFired: this.alleyEventsFired,
+      tray: this.tray.map((t) => ({
+        shapeId: t.shape?.id ?? 'mono',
+        colorKey: t.colorKey,
+        placed: t.placed,
+      })),
     });
   }
 
@@ -331,11 +402,23 @@ class BoardScene extends Phaser.Scene {
     }));
   }
 
-  spawnTray() {
+  spawnTray(restorePieces = null) {
     this.tray = [];
-    const trayData = pickRandomTray(TRAY_SIZE);
+    const trayData = restorePieces ?? pickRandomTray(TRAY_SIZE);
     const slots = this.getTraySlotPositions();
     trayData.forEach((piece, i) => {
+      if (piece.placed) {
+        this.tray.push({
+          shape: piece.shape,
+          colorKey: piece.colorKey,
+          container: null,
+          homeX: slots[i].x,
+          homeY: slots[i].y,
+          slot: i,
+          placed: true,
+        });
+        return;
+      }
       const trayCellSize = slots[i].cellSize * 0.55;
       const container = this.buildPieceContainer(piece.shape, piece.colorKey, trayCellSize);
       container.x = slots[i].x;
@@ -539,6 +622,7 @@ class BoardScene extends Phaser.Scene {
     this.refreshHud();
 
     this.maybeFireAlleyEvent(prevScore);
+    this.saveProgress();
   }
 
   pieceCenterInWorld(shape, row, col) {
@@ -831,6 +915,7 @@ class BoardScene extends Phaser.Scene {
       this.updateTrayDimStates();
       this.refreshHud();
       this.gameOver = false;
+      this.saveProgress();
     });
   }
 
@@ -848,6 +933,7 @@ class BoardScene extends Phaser.Scene {
       this.updateTrayDimStates();
       this.refreshHud();
       this.gameOver = false;
+      this.saveProgress();
     });
   }
 
@@ -1010,6 +1096,7 @@ class BoardScene extends Phaser.Scene {
 
   triggerGameOver() {
     this.gameOver = true;
+    clearRunSnapshot();
     const finalScore = this.score;
     const rankPromise = submitScore(finalScore);
     this.time.delayedCall(320, () => {
@@ -1071,6 +1158,8 @@ async function boot() {
   const gate = new GateScreen();
   gate.begin();
   await gate.awaitVerified();
+
+  pendingSnapshot = await loadRunSnapshot();
 
   new Phaser.Game(config);
 }
