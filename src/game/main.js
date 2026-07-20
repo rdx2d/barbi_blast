@@ -8,6 +8,8 @@ import { GameOverModal } from '../ui/gameOverModal.js';
 import { GateScreen } from '../ui/gateScreen.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
 import { MusicControls } from '../ui/musicControls.js';
+import { getTelegramUser } from '../telegram/identity.js';
+import { submitScore } from '../net/api.js';
 
 const COLORS = Object.freeze({
   bgBase: 0x1e1e24,
@@ -201,6 +203,15 @@ class BoardScene extends Phaser.Scene {
       fontSize: '22px',
       color: CSS.accentPrimary,
     }).setOrigin(1, 0);
+
+    const user = getTelegramUser();
+    if (user) {
+      this.add.text(leftX, y + 34, `@${user.displayName}`, {
+        fontFamily: '"VT323"',
+        fontSize: '20px',
+        color: CSS.textMuted,
+      }).setOrigin(0, 0);
+    }
   }
 
   refreshHud() {
@@ -999,8 +1010,10 @@ class BoardScene extends Phaser.Scene {
 
   triggerGameOver() {
     this.gameOver = true;
+    const finalScore = this.score;
+    const rankPromise = submitScore(finalScore);
     this.time.delayedCall(320, () => {
-      this.modal?.show({ score: this.score, high: this.highScore });
+      this.modal?.show({ score: finalScore, high: this.highScore, rankPromise });
     });
   }
 }

@@ -26,9 +26,13 @@ export class GameOverModal {
     this.playAgainBtn.addEventListener('click', () => this.onPlayAgainClick());
   }
 
-  async show({ score, high }) {
+  async show({ score, high, rankPromise }) {
     this.scoreEl.textContent = String(score);
     this.highEl.textContent = String(high);
+    if (this.statusEl) {
+      this.statusEl.textContent = '✓ holder verified';
+      this.statusEl.classList.add('holder');
+    }
 
     this.root.setAttribute('aria-hidden', 'false');
     this.root.classList.add('visible');
@@ -39,6 +43,18 @@ export class GameOverModal {
         const p = this.video.play();
         if (p?.catch) p.catch(() => {});
       } catch {}
+    }
+
+    if (rankPromise) {
+      rankPromise.then((result) => {
+        if (!result || !this.statusEl) return;
+        const parts = [];
+        if (result.globalRank) parts.push(`global #${result.globalRank}`);
+        if (result.weekRank) parts.push(`week #${result.weekRank}`);
+        if (parts.length > 0) {
+          this.statusEl.textContent = `✓ ranked ${parts.join(' • ')}`;
+        }
+      }).catch(() => {});
     }
   }
 
