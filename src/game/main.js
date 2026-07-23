@@ -8,6 +8,7 @@ import { GameOverModal } from '../ui/gameOverModal.js';
 import { GateScreen } from '../ui/gateScreen.js';
 import { HomeScreen } from '../ui/homeScreen.js';
 import { SettingsSheet } from '../ui/settingsSheet.js';
+import { SkinPicker } from '../ui/skinPicker.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
@@ -1229,6 +1230,8 @@ async function boot() {
     actions: {},
   });
 
+  const skinPicker = new SkinPicker();
+
   const homeSettingsSheet = new SettingsSheet({
     id: 'home-settings',
     player: musicPlayer,
@@ -1243,7 +1246,7 @@ async function boot() {
     player: musicPlayer,
     actions: {
       home: () => showHome(),
-      skin: () => console.info('[game] CHOOSE SKIN — picker ships in Step 5'),
+      skin: () => skinPicker.show(),
       replay: () => {
         const scene = activeScene();
         if (scene) scene.hardReset();
