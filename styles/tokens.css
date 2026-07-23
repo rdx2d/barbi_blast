@@ -237,6 +237,156 @@ body {
   color: var(--text-muted);
 }
 
+#home-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  opacity: 1;
+  transition: opacity 320ms ease-out;
+}
+
+#home-screen[aria-hidden="true"] {
+  display: none;
+}
+
+#home-screen.leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#home-screen .home-backdrop {
+  position: absolute;
+  inset: 0;
+  background: url('../assets/img/fentanyl-barbi.webp') center/cover no-repeat;
+  filter: brightness(0.55) saturate(1.15) hue-rotate(-8deg);
+}
+
+#home-screen .home-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(15,15,19,0.25), rgba(15,15,19,0.9) 75%),
+    linear-gradient(180deg, rgba(15,15,19,0.5), rgba(15,15,19,0.85));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+#home-screen .home-inner {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 460px);
+  padding: 32px 26px 26px;
+  border-radius: 22px;
+  background: rgba(15, 15, 19, 0.6);
+  border: 2px solid rgba(57, 255, 20, 0.4);
+  box-shadow: 0 0 42px rgba(57, 255, 20, 0.3), inset 0 0 24px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: settingsSheetIn 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+#home-screen .home-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+#home-screen .home-title {
+  font-family: var(--font-arcade);
+  font-size: 34px;
+  color: var(--accent-primary);
+  margin: 8px 0 6px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 16px rgba(57, 255, 20, 0.85), 3px 3px 0 #000;
+}
+
+#home-screen .home-user {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--text-muted);
+  margin: 4px 0 20px;
+  min-height: 18px;
+}
+
+#home-screen .home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-btn {
+  font-family: var(--font-arcade);
+  font-size: 14px;
+  letter-spacing: 1px;
+  padding: 16px 12px;
+  border: 2px solid;
+  border-radius: 12px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-primary);
+  transition: transform 100ms ease-out, background 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.home-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.home-btn.primary {
+  background: rgba(57, 255, 20, 0.16);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
+  box-shadow: 0 0 22px rgba(57, 255, 20, 0.35);
+}
+
+.home-btn.ghost {
+  border-color: rgba(160, 160, 165, 0.35);
+  color: var(--text-primary);
+}
+
+.home-btn.buy {
+  background: rgba(153, 69, 255, 0.16);
+  border-color: var(--accent-solana);
+  color: var(--accent-solana);
+  text-shadow: 0 0 8px rgba(153, 69, 255, 0.85);
+  box-shadow: 0 0 22px rgba(153, 69, 255, 0.4);
+}
+
+.corner-gear {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1020;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid rgba(57, 255, 20, 0.5);
+  background: rgba(15, 15, 19, 0.7);
+  color: var(--accent-primary);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.25);
+  transition: transform 100ms ease-out, box-shadow 150ms ease-out;
+  padding: 0;
+}
+
+.corner-gear:active {
+  transform: scale(0.94) rotate(30deg);
+}
+
+.corner-gear[hidden] {
+  display: none;
+}
+
 .settings-sheet {
   position: fixed;
   inset: 0;

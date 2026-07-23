@@ -6,6 +6,8 @@ import { scoreDrop, advanceStreak, multiplierForStreak } from './scoring.js';
 import { ALLEY_EVENT_INTERVAL, eventsDueAfterScoreCross, pickEvent, runEvent, EVENT_META } from './alleyEvents.js';
 import { GameOverModal } from '../ui/gameOverModal.js';
 import { GateScreen } from '../ui/gateScreen.js';
+import { HomeScreen } from '../ui/homeScreen.js';
+import { SettingsSheet } from '../ui/settingsSheet.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
@@ -1199,9 +1201,47 @@ async function boot() {
   gate.begin();
   await gate.awaitVerified();
 
-  pendingSnapshot = await loadRunSnapshot();
+  let phaserGame = null;
+  let moreSettingsSheet = null;
+  let homeSettingsSheet = null;
 
-  new Phaser.Game(config);
+  const showHome = () => {
+    document.getElementById('game-root').style.display = 'none';
+    document.getElementById('game-gear').hidden = true;
+    home.show();
+  };
+
+  const startGame = async () => {
+    pendingSnapshot = await loadRunSnapshot();
+    document.getElementById('game-root').style.display = '';
+    document.getElementById('game-gear').hidden = false;
+    if (!phaserGame) {
+      phaserGame = new Phaser.Game(config);
+    }
+  };
+
+  moreSettingsSheet = new SettingsSheet({
+    id: 'more-settings',
+    player: null,
+    actions: {},
+  });
+
+  homeSettingsSheet = new SettingsSheet({
+    id: 'home-settings',
+    player: musicPlayer,
+    actions: {
+      medals: () => console.info('[home] MEDALS tapped — leaderboard modal ships in Step 6'),
+      more: () => moreSettingsSheet.show(),
+    },
+  });
+
+  const home = new HomeScreen({
+    onPlay: startGame,
+    onOpenLeaderboard: () => console.info('[home] leaderboard modal ships in Step 6'),
+    onOpenSettings: () => homeSettingsSheet.show(),
+  });
+
+  showHome();
 }
 
 boot();

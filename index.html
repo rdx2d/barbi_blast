@@ -44,6 +44,24 @@
     </div>
   </div>
 
+  <div id="home-screen" aria-hidden="true">
+    <div class="home-backdrop"></div>
+    <div class="home-scrim"></div>
+    <button id="home-gear" class="corner-gear" type="button" aria-label="Settings">⚙</button>
+    <div class="home-inner">
+      <div class="home-eyebrow">// slum alley · $FB //</div>
+      <h1 class="home-title">BARBI BLAST</h1>
+      <div class="home-user" data-slot="user"></div>
+      <div class="home-actions">
+        <button class="home-btn primary" data-slot="play" type="button">▶ PLAY THE GAME</button>
+        <button class="home-btn ghost" data-slot="leaderboard" type="button">🏆 LEADERBOARD</button>
+        <button class="home-btn buy" data-slot="buy" type="button">💊 BUY $FB</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="game-gear" class="corner-gear" type="button" aria-label="Settings" hidden>⚙</button>
+
   <audio id="bg-audio" preload="none" playsinline></audio>
 
   <div id="home-settings" class="settings-sheet" role="dialog" aria-label="Home settings" hidden>
