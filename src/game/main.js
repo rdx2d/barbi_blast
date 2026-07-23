@@ -9,6 +9,7 @@ import { GateScreen } from '../ui/gateScreen.js';
 import { HomeScreen } from '../ui/homeScreen.js';
 import { SettingsSheet } from '../ui/settingsSheet.js';
 import { SkinPicker } from '../ui/skinPicker.js';
+import { LeaderboardModal } from '../ui/leaderboardModal.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
@@ -1231,12 +1232,13 @@ async function boot() {
   });
 
   const skinPicker = new SkinPicker();
+  const leaderboardModal = new LeaderboardModal();
 
   const homeSettingsSheet = new SettingsSheet({
     id: 'home-settings',
     player: musicPlayer,
     actions: {
-      medals: () => console.info('[home] MEDALS tapped — leaderboard modal ships in Step 6'),
+      medals: () => leaderboardModal.show(),
       more: () => moreSettingsSheet.show(),
     },
   });
@@ -1258,7 +1260,7 @@ async function boot() {
 
   const home = new HomeScreen({
     onPlay: startGame,
-    onOpenLeaderboard: () => console.info('[home] leaderboard modal ships in Step 6'),
+    onOpenLeaderboard: () => leaderboardModal.show(),
     onOpenSettings: () => homeSettingsSheet.show(),
   });
 
