@@ -1202,8 +1202,6 @@ async function boot() {
   await gate.awaitVerified();
 
   let phaserGame = null;
-  let moreSettingsSheet = null;
-  let homeSettingsSheet = null;
 
   const showHome = () => {
     document.getElementById('game-root').style.display = 'none';
@@ -1220,13 +1218,18 @@ async function boot() {
     }
   };
 
-  moreSettingsSheet = new SettingsSheet({
+  const activeScene = () => {
+    if (!phaserGame) return null;
+    return phaserGame.scene.getScene('BoardScene');
+  };
+
+  const moreSettingsSheet = new SettingsSheet({
     id: 'more-settings',
     player: null,
     actions: {},
   });
 
-  homeSettingsSheet = new SettingsSheet({
+  const homeSettingsSheet = new SettingsSheet({
     id: 'home-settings',
     player: musicPlayer,
     actions: {
@@ -1234,6 +1237,21 @@ async function boot() {
       more: () => moreSettingsSheet.show(),
     },
   });
+
+  const gameSettingsSheet = new SettingsSheet({
+    id: 'game-settings',
+    player: musicPlayer,
+    actions: {
+      home: () => showHome(),
+      skin: () => console.info('[game] CHOOSE SKIN — picker ships in Step 5'),
+      replay: () => {
+        const scene = activeScene();
+        if (scene) scene.hardReset();
+      },
+    },
+  });
+
+  document.getElementById('game-gear').addEventListener('click', () => gameSettingsSheet.show());
 
   const home = new HomeScreen({
     onPlay: startGame,
