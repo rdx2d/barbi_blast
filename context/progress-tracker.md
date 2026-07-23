@@ -1,10 +1,10 @@
 # Progress Tracker
 
 ## Current Phase
-- Unit 05b complete (real Solana RPC + manual paste connect). The end-to-end token gate is functional; awaiting Unit 06 (Telegram Cloud Storage high-score persistence) or Unit 07 (Alley Event variants — Fire Zone, Alley Rats).
+- Unit 07 complete (home screen + navigation + skins + leaderboard UI). All seven persistence/leaderboard deliverables shipped and reachable from the UI. App flow: gate → HOME → PLAY ⇄ game.
 
 ## Current Goal
-- Persist high-score across sessions via Telegram CloudStorage (with localStorage fallback when running outside Telegram).
+- Stabilize + user QA of the full flow in Telegram. Backlog candidates next: Alley Event variants (Fire Zone, Alley Rats), achievements to back the MEDALS surface, real "MORE SETTINGS" content.
 
 ## Completed
 - **Unit 01**: Base 8x8 matrix implementation and canvas rendering.
@@ -54,20 +54,31 @@
   - `frogRocketRevive()`: radial-fling explosion of all board sprites (cells + hazards), 480ms camera shake, toxic-green full-canvas flash, big Solana-teal "FROG ROCKET" banner with glow FX, "BOARD WIPED • RUN CONTINUES" subtitle. Score kept, streak reset, fresh tray spawned after 900ms.
   - `hardReset()` (PLAY AGAIN): simpler fade-out, score to 0, streak reset, alleyEventsFired reset, fresh tray after 400ms.
 
+- **Unit 06 (a–d)**: Backend + persistence + leaderboards.
+  - `api/` — first server-side component: Vercel functions + Upstash Redis (REST, zero npm deps). `POST /api/submit` validates Telegram initData HMAC (`TELEGRAM_BOT_TOKEN` env), rate-limits 1/5s, updates `player:{tgId}` hash + `lb:global` / `lb:week:{ISO}` ZSETs (GT semantics), returns ranks. `GET /api/leaderboard?scope=global|week` returns top 50 + caller's rank via `X-Telegram-Init-Data` header. Weekly boards expire after 21 days.
+  - `src/telegram/identity.js` — user from `initDataUnsafe` (mock fallback under `?mock=1`); `src/net/api.js` — `submitScore`/`fetchLeaderboard` with 5s abort timeout, never throws into game flow.
+  - `src/storage/progress.js` — mid-run snapshot (grid/colors/score/streak/alley counter/tray shapeIds), write-through localStorage + Telegram CloudStorage; restore on boot after gate; cleared on game-over so dead boards can't resurrect.
+  - HUD shows @username; game-over modal upgrades status line to "ranked global #N • week #N" from the submit response.
+  - RPC lesson learned: gate balance reads now walk a failover chain and live on Helius (free key) — every unauthenticated public Solana RPC blocks `getTokenAccountsByOwner`+programId from browsers.
+- **Unit 07**: Home screen + navigation + skins + leaderboard UI.
+  - Flow inverted: gate → **HOME** (Barbi backdrop, PLAY / LEADERBOARD / BUY $FB, gear top-right) → PLAY lazily constructs Phaser once → in-game gear (replaces old music button) opens settings sheet with GO HOME / CHOOSE SKIN / REPLAY + shared music controls.
+  - `src/ui/homeScreen.js`, `src/ui/settingsSheet.js` (one class, home/game modes), `src/ui/skinPicker.js`, `src/ui/leaderboardModal.js`; old `musicControls.js` deleted.
+  - `src/game/skins.js` — 3 palette variants (neon default = no-op tint, candy, chrome) via `setTint`; persists `bb.skin`; `bb:skin-changed` event live-retints board/tray/hazards through `BoardScene.retintAll()`.
+  - Leaderboard modal: GLOBAL/THIS WEEK tabs, top-50, podium tints, own row highlight + YOU pin. Reachable from Home button and MEDALS in home settings.
+  - GO HOME keeps the Phaser scene alive (canvas hidden); PLAY re-reveals it — mid-run state survives via the snapshot system anyway.
+
 ## In Progress
 - None.
 
 ## Next Up
-- **Unit 06**: High-score persistence.
-  - Telegram CloudStorage (`window.Telegram.WebApp.CloudStorage.setItem/getItem`) inside the mini app; localStorage fallback in browser dev.
-  - Load on scene create, save after every score high-water advance.
-  - Optional: also persist the last-verified wallet address so returning holders skip the paste step.
+- User QA pass of the full navigation flow in Telegram (gate → home → game → gear menus → skins → leaderboard).
 
 ## Backlog
 - **Additional Alley Events** (framework in place, add types later):
   - **Fire Zone**: highlights a 2×2 region for 1 tray-cycle; any piece placed there gets its cells locked until the next event.
   - **Alley Rats**: nibbles 4 random cells — inverts filled/empty state.
-- **High-score persistence**: Telegram CloudStorage (with localStorage fallback).
+- **Achievements system** to back the MEDALS surface (currently opens leaderboard).
+- **MORE SETTINGS content** (sheet exists as a stub).
 
 ## Open Questions
 - (none currently open)
