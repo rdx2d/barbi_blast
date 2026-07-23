@@ -237,89 +237,100 @@ body {
   color: var(--text-muted);
 }
 
-#music-hud {
+.settings-sheet {
   position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 900;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-}
-
-#music-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid rgba(57, 255, 20, 0.5);
-  background: rgba(15, 15, 19, 0.7);
-  color: var(--accent-primary);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
+  inset: 0;
+  z-index: 1050;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 12px rgba(57, 255, 20, 0.25);
-  transition: transform 100ms ease-out, box-shadow 150ms ease-out;
-  padding: 0;
+  color: var(--text-primary);
+  opacity: 1;
+  transition: opacity 220ms ease-out;
 }
 
-#music-btn:active {
-  transform: scale(0.95);
+.settings-sheet[hidden] {
+  display: none;
 }
 
-#music-btn[data-state="muted"] {
-  border-color: rgba(160, 160, 165, 0.4);
-  color: var(--text-muted);
-  box-shadow: none;
+.settings-sheet.closing {
+  opacity: 0;
+  pointer-events: none;
 }
 
-#music-btn[data-state="muted"] .music-icon::after {
-  content: " /";
-  color: #ff5c5c;
-  margin-left: -2px;
-}
-
-#music-panel {
+.settings-scrim {
   position: absolute;
-  top: 54px;
-  right: 0;
-  min-width: 240px;
-  padding: 14px;
+  inset: 0;
+  background: rgba(15, 15, 19, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.settings-card {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 420px);
+  padding: 22px 22px 20px;
+  border-radius: 18px;
   background: rgba(15, 15, 19, 0.92);
-  border: 2px solid rgba(57, 255, 20, 0.35);
-  border-radius: 14px;
-  box-shadow: 0 0 24px rgba(57, 255, 20, 0.22), 0 12px 32px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  border: 2px solid rgba(57, 255, 20, 0.4);
+  box-shadow: 0 0 32px rgba(57, 255, 20, 0.28), inset 0 0 20px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  animation: musicPanelIn 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  gap: 14px;
+  animation: settingsSheetIn 200ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
-#music-panel[hidden] { display: none; }
-
-@keyframes musicPanelIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+@keyframes settingsSheetIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.music-panel-head {
+.settings-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.music-panel-label {
+.settings-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.settings-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.settings-close:hover, .settings-close:active {
+  color: var(--accent-primary);
+  background: rgba(57, 255, 20, 0.12);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-label {
   font-family: var(--font-arcade);
   font-size: 11px;
   letter-spacing: 1px;
   color: var(--text-muted);
 }
 
-.music-toggle {
+.settings-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -332,7 +343,7 @@ body {
   padding: 0;
 }
 
-.music-toggle-track {
+.settings-toggle-track {
   width: 40px;
   height: 20px;
   border-radius: 10px;
@@ -341,7 +352,7 @@ body {
   transition: background 150ms ease-out;
 }
 
-.music-toggle-thumb {
+.settings-toggle-thumb {
   position: absolute;
   top: 2px;
   left: 2px;
@@ -352,32 +363,26 @@ body {
   transition: left 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
-.music-toggle[aria-pressed="true"] .music-toggle-track {
+.settings-toggle[aria-pressed="true"] .settings-toggle-track {
   background: rgba(57, 255, 20, 0.6);
   box-shadow: 0 0 10px rgba(57, 255, 20, 0.55);
 }
 
-.music-toggle[aria-pressed="true"] .music-toggle-thumb {
+.settings-toggle[aria-pressed="true"] .settings-toggle-thumb {
   left: 22px;
 }
 
-.music-toggle-state {
+.settings-toggle-state {
   color: var(--text-muted);
   min-width: 24px;
   text-align: left;
 }
 
-.music-toggle[aria-pressed="true"] .music-toggle-state {
+.settings-toggle[aria-pressed="true"] .settings-toggle-state {
   color: var(--accent-primary);
 }
 
-.music-panel-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.music-panel-row input[type="range"] {
+.settings-row input[type="range"] {
   flex: 1;
   -webkit-appearance: none;
   appearance: none;
@@ -387,7 +392,7 @@ body {
   outline: none;
 }
 
-.music-panel-row input[type="range"]::-webkit-slider-thumb {
+.settings-row input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 16px;
@@ -399,7 +404,7 @@ body {
   cursor: pointer;
 }
 
-.music-panel-row input[type="range"]::-moz-range-thumb {
+.settings-row input[type="range"]::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -409,7 +414,7 @@ body {
   cursor: pointer;
 }
 
-.music-panel-track {
+.settings-track {
   font-family: var(--font-mono);
   font-size: 15px;
   color: var(--text-muted);
@@ -418,6 +423,43 @@ body {
   text-overflow: ellipsis;
   padding-top: 4px;
   border-top: 1px dashed rgba(160, 160, 165, 0.2);
+}
+
+.settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.settings-btn {
+  font-family: var(--font-arcade);
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 12px;
+  border: 2px solid;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-primary);
+  transition: transform 100ms ease-out, background 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.settings-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.settings-btn.primary {
+  background: rgba(57, 255, 20, 0.14);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.6);
+  box-shadow: 0 0 16px rgba(57, 255, 20, 0.28);
+}
+
+.settings-btn.ghost {
+  border-color: rgba(160, 160, 165, 0.4);
+  color: var(--text-muted);
 }
 
 #game-over-modal {

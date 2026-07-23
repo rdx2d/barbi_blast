@@ -46,23 +46,67 @@
 
   <audio id="bg-audio" preload="none" playsinline></audio>
 
-  <div id="music-hud">
-    <button id="music-btn" type="button" aria-label="Music controls" aria-expanded="false" data-state="playing">
-      <span class="music-icon" aria-hidden="true">♪</span>
-    </button>
-    <div id="music-panel" role="dialog" aria-label="Music settings" hidden>
-      <div class="music-panel-head">
-        <div class="music-panel-label">MUSIC</div>
-        <button class="music-toggle" type="button" data-slot="toggle" aria-pressed="true">
-          <span class="music-toggle-track"><span class="music-toggle-thumb"></span></span>
-          <span class="music-toggle-state" data-slot="toggle-state">ON</span>
+  <div id="home-settings" class="settings-sheet" role="dialog" aria-label="Home settings" hidden>
+    <div class="settings-scrim"></div>
+    <div class="settings-card">
+      <div class="settings-head">
+        <div class="settings-eyebrow">// settings //</div>
+        <button class="settings-close" data-slot="close" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">MUSIC</div>
+        <button class="settings-toggle" data-slot="toggle" type="button" aria-pressed="true">
+          <span class="settings-toggle-track"><span class="settings-toggle-thumb"></span></span>
+          <span class="settings-toggle-state" data-slot="toggle-state">ON</span>
         </button>
       </div>
-      <div class="music-panel-row">
-        <span class="music-panel-label">VOLUME</span>
+      <div class="settings-row">
+        <div class="settings-label">VOLUME</div>
         <input type="range" min="0" max="100" value="55" step="1" data-slot="volume" aria-label="Volume" />
       </div>
-      <div class="music-panel-track" data-slot="track" title="Now playing">—</div>
+      <div class="settings-track" data-slot="track">—</div>
+      <div class="settings-actions">
+        <button class="settings-btn primary" data-slot="medals" type="button">🏅 MEDALS</button>
+        <button class="settings-btn ghost" data-slot="more" type="button">MORE SETTINGS</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-settings" class="settings-sheet" role="dialog" aria-label="Game settings" hidden>
+    <div class="settings-scrim"></div>
+    <div class="settings-card">
+      <div class="settings-head">
+        <div class="settings-eyebrow">// settings //</div>
+        <button class="settings-close" data-slot="close" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">MUSIC</div>
+        <button class="settings-toggle" data-slot="toggle" type="button" aria-pressed="true">
+          <span class="settings-toggle-track"><span class="settings-toggle-thumb"></span></span>
+          <span class="settings-toggle-state" data-slot="toggle-state">ON</span>
+        </button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">VOLUME</div>
+        <input type="range" min="0" max="100" value="55" step="1" data-slot="volume" aria-label="Volume" />
+      </div>
+      <div class="settings-track" data-slot="track">—</div>
+      <div class="settings-actions">
+        <button class="settings-btn primary" data-slot="home" type="button">🏠 GO HOME</button>
+        <button class="settings-btn ghost" data-slot="skin" type="button">🎨 CHOOSE SKIN</button>
+        <button class="settings-btn ghost" data-slot="replay" type="button">↻ REPLAY GAME</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="more-settings" class="settings-sheet" role="dialog" aria-label="More settings" hidden>
+    <div class="settings-scrim"></div>
+    <div class="settings-card">
+      <div class="settings-head">
+        <div class="settings-eyebrow">// more settings //</div>
+        <button class="settings-close" data-slot="close" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="settings-track">nothing here yet — coming soon.</div>
     </div>
   </div>
 

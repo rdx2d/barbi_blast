@@ -7,7 +7,6 @@ import { ALLEY_EVENT_INTERVAL, eventsDueAfterScoreCross, pickEvent, runEvent, EV
 import { GameOverModal } from '../ui/gameOverModal.js';
 import { GateScreen } from '../ui/gateScreen.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
-import { MusicControls } from '../ui/musicControls.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
 import { saveRunSnapshot, loadRunSnapshot, clearRunSnapshot } from '../storage/progress.js';
@@ -1176,7 +1175,6 @@ async function boot() {
   let musicPlayer = null;
   try {
     musicPlayer = new MusicPlayer();
-    new MusicControls({ player: musicPlayer });
     musicPlayer.start();
 
     // WebKit (Telegram iOS WebView) only grants audio "user activation" on
