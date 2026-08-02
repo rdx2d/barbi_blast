@@ -10,6 +10,7 @@ import { HomeScreen } from '../ui/homeScreen.js';
 import { SettingsSheet } from '../ui/settingsSheet.js';
 import { SkinPicker } from '../ui/skinPicker.js';
 import { LeaderboardModal } from '../ui/leaderboardModal.js';
+import { SurveyModal, isSurveyDone } from '../ui/surveyModal.js';
 import { MusicPlayer } from '../audio/musicPlayer.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
@@ -1203,9 +1204,15 @@ async function boot() {
 
   let phaserGame = null;
 
+  const surveyBtn = document.getElementById('survey-btn');
+  const refreshSurveyBtn = (gameActive) => {
+    surveyBtn.hidden = !gameActive || isSurveyDone();
+  };
+
   const showHome = () => {
     document.getElementById('game-root').style.display = 'none';
     document.getElementById('game-gear').hidden = true;
+    refreshSurveyBtn(false);
     home.show();
   };
 
@@ -1213,6 +1220,7 @@ async function boot() {
     pendingSnapshot = await loadRunSnapshot();
     document.getElementById('game-root').style.display = '';
     document.getElementById('game-gear').hidden = false;
+    refreshSurveyBtn(true);
     if (!phaserGame) {
       phaserGame = new Phaser.Game(config);
     }
@@ -1231,6 +1239,11 @@ async function boot() {
 
   const skinPicker = new SkinPicker();
   const leaderboardModal = new LeaderboardModal();
+
+  const surveyModal = new SurveyModal({
+    onCompleted: () => refreshSurveyBtn(document.getElementById('game-root').style.display !== 'none'),
+  });
+  surveyBtn.addEventListener('click', () => surveyModal.show());
 
   const homeSettingsSheet = new SettingsSheet({
     id: 'home-settings',

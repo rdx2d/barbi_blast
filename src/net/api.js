@@ -56,3 +56,29 @@ export async function fetchLeaderboard(scope = 'global') {
     return null;
   }
 }
+
+export async function submitSurvey({ answers, rating, review }) {
+  const initData = getRawInitData();
+  if (!initData) {
+    console.info('[api] no telegram auth, survey stored locally only');
+    return { ok: true, local: true };
+  }
+  try {
+    return await withTimeout(async (signal) => {
+      const res = await fetch('/api/survey', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initData, answers, rating, review }),
+        signal,
+      });
+      if (!res.ok) {
+        console.warn('[api] survey submit failed', res.status);
+        return null;
+      }
+      return res.json();
+    });
+  } catch (err) {
+    console.warn('[api] survey error', err?.name ?? err);
+    return null;
+  }
+}
