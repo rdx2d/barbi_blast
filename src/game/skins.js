@@ -1,10 +1,17 @@
 const STORAGE_KEY = 'bb.skin';
 
+// base: 'color' renders blocks from the original colored Kenney sprites
+//       (tint 0xffffff = pass-through, exact stock look).
+//       'grey' renders every block from the neutral grey sprite and relies
+//       on the tint to supply the color — required because Phaser tints
+//       MULTIPLY with texture pixels, so tinting an already-saturated
+//       green sprite pastel-pink produces almost no visible change.
 export const SKIN_DEFS = Object.freeze({
   neon: {
     id: 'neon',
     label: 'NEON TOXIC',
     swatch: '#39ff14',
+    base: 'color',
     tints: {
       green: 0xffffff,
       purple: 0xffffff,
@@ -18,26 +25,28 @@ export const SKIN_DEFS = Object.freeze({
     id: 'candy',
     label: 'CANDY PASTEL',
     swatch: '#ffb3f7',
+    base: 'grey',
     tints: {
-      green: 0x9dff9d,
-      purple: 0xffb3f7,
-      blue: 0xa8daff,
-      red: 0xff9db1,
-      yellow: 0xfff6a8,
-      grey: 0xe6dfe0,
+      green: 0x8affa0,
+      purple: 0xffa3f0,
+      blue: 0x8fd0ff,
+      red: 0xff8fa8,
+      yellow: 0xfff08f,
+      grey: 0xf0e8ea,
     },
   },
   chrome: {
     id: 'chrome',
     label: 'MONO CHROME',
     swatch: '#d0d0d0',
+    base: 'grey',
     tints: {
-      green: 0xd0d0d0,
-      purple: 0xd0d0d0,
-      blue: 0xd0d0d0,
-      red: 0xd0d0d0,
-      yellow: 0xd0d0d0,
-      grey: 0xd0d0d0,
+      green: 0xf2f2f2,
+      purple: 0x9a9a9a,
+      blue: 0xc6c6c6,
+      red: 0x767676,
+      yellow: 0xe0e0e0,
+      grey: 0xb0b0b0,
     },
   },
 });
@@ -67,4 +76,8 @@ export function setActiveSkin(id) {
 export function tintFor(colorKey) {
   const skin = getActiveSkin();
   return skin.tints[colorKey] ?? 0xffffff;
+}
+
+export function usesGreyBase() {
+  return getActiveSkin().base === 'grey';
 }

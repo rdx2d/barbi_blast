@@ -14,7 +14,11 @@ import { MusicPlayer } from '../audio/musicPlayer.js';
 import { getTelegramUser } from '../telegram/identity.js';
 import { submitScore } from '../net/api.js';
 import { saveRunSnapshot, loadRunSnapshot, clearRunSnapshot } from '../storage/progress.js';
-import { tintFor } from './skins.js';
+import { tintFor, usesGreyBase } from './skins.js';
+
+function textureKeyFor(colorKey) {
+  return usesGreyBase() ? COLOR_TO_TEXTURE.grey : (COLOR_TO_TEXTURE[colorKey] ?? COLOR_TO_TEXTURE.green);
+}
 
 let pendingSnapshot = null;
 
@@ -148,7 +152,7 @@ class BoardScene extends Phaser.Scene {
           const sprite = this.add.image(
             world.x + cellSize / 2,
             world.y + cellSize / 2,
-            COLOR_TO_TEXTURE[colorKey] ?? COLOR_TO_TEXTURE.green,
+            textureKeyFor(colorKey),
           );
           sprite.setDisplaySize(cellSize, cellSize);
           sprite.setTint(tintFor(colorKey));
@@ -162,31 +166,26 @@ class BoardScene extends Phaser.Scene {
   }
 
   retintAll() {
+    const reskin = (sprite) => {
+      const key = sprite.getData?.('colorKey');
+      if (!key) return;
+      const w = sprite.displayWidth;
+      const h = sprite.displayHeight;
+      sprite.setTexture(textureKeyFor(key));
+      sprite.setDisplaySize(w, h);
+      sprite.setTint(tintFor(key));
+    };
+
     for (let r = 0; r < GRID_SIZE; r++) {
       for (let c = 0; c < GRID_SIZE; c++) {
         const s = this.cellSprites?.[r]?.[c];
-        if (s && s.getData) {
-          const key = s.getData('colorKey');
-          if (key) s.setTint(tintFor(key));
-        }
-        const h = this.hazardSprites?.[r]?.[c];
-        if (h && h.list) {
-          for (const child of h.list) {
-            if (child.getData && child.getData('colorKey')) {
-              child.setTint(tintFor(child.getData('colorKey')));
-            }
-          }
-        }
+        if (s) reskin(s);
       }
     }
     for (const entry of this.tray ?? []) {
       const container = entry.container;
       if (!container || !container.list) continue;
-      for (const child of container.list) {
-        if (child.getData && child.getData('colorKey')) {
-          child.setTint(tintFor(child.getData('colorKey')));
-        }
-      }
+      for (const child of container.list) reskin(child);
     }
   }
 
@@ -497,7 +496,7 @@ class BoardScene extends Phaser.Scene {
         if (shape.matrix[r][c] !== 1) continue;
         const x = originX + c * (cellSize + gap) + cellSize / 2;
         const y = originY + r * (cellSize + gap) + cellSize / 2;
-        const sprite = this.add.image(x, y, COLOR_TO_TEXTURE[colorKey]);
+        const sprite = this.add.image(x, y, textureKeyFor(colorKey));
         sprite.setDisplaySize(cellSize, cellSize);
         sprite.setTint(tintFor(colorKey));
         sprite.setData('colorKey', colorKey);
@@ -607,7 +606,7 @@ class BoardScene extends Phaser.Scene {
         const gc = col + c;
         this.gridColors[gr][gc] = entry.colorKey;
         const world = this.cellToWorld(gr, gc);
-        const sprite = this.add.image(world.x + cellSize / 2, world.y + cellSize / 2, COLOR_TO_TEXTURE[entry.colorKey]);
+        const sprite = this.add.image(world.x + cellSize / 2, world.y + cellSize / 2, textureKeyFor(entry.colorKey));
         sprite.setDisplaySize(cellSize, cellSize);
         sprite.setTint(tintFor(entry.colorKey));
         sprite.setData('colorKey', entry.colorKey);
@@ -907,8 +906,7 @@ class BoardScene extends Phaser.Scene {
 
     const base = this.add.image(0, 0, COLOR_TO_TEXTURE.grey);
     base.setDisplaySize(cellSize, cellSize);
-    base.setTint(tintFor('grey'));
-    base.setData('colorKey', 'grey');
+    base.setTint(0x3a3a3a);
     container.add(base);
 
     const stripes = this.add.graphics();
